@@ -1,4 +1,5 @@
 Import("env")
+import os
 
 # Exclude specific GFX library source files that do not compile for this target.
 # Arduino_ESP32LCD8.cpp — requires 8-bit parallel LCD hardware not present on PandaTouch.
@@ -15,3 +16,55 @@ def skip_from_build(env, node):
 
 for pattern in custom_build_files_exclude.split():
     env.AddBuildMiddleware(skip_from_build, pattern)
+
+# ── Patch Arduino_ESP32RGBPanel.h ──────────────────────────────────────────
+# GFX 1.6.1 introduced a bug in the header guard that controls the definition
+# of the internal esp_rgb_panel_t struct copy.  The condition was changed from
+# (ESP_ARDUINO_VERSION_MAJOR < 3) to (ESP_ARDUINO_VERSION_MAJOR > 5), which
+# means the struct is never included for any currently-shipping Arduino ESP32
+# version (2.x or 3.x).  The .cpp still uses the old (< 3) guard, so when
+# ESP_ARDUINO_VERSION_MAJOR == 2 the code tries to use the struct that the
+# header no longer defines → compile error.
+# Restoring the original < 3 condition makes the struct available for 2.x and
+# keeps 3.x unaffected (3 < 3 = false → struct omitted, else-branch used).
+def patch_rgb_panel_header():
+    libdeps_dir = os.path.join(
+        env.subst("$PROJECT_LIBDEPS_DIR"),
+        env.subst("$PIOENV"),
+    )
+    target = os.path.join(
+        libdeps_dir,
+        "GFX Library for Arduino",
+        "src", "databus", "Arduino_ESP32RGBPanel.h",
+    )
+    if not os.path.isfile(target):
+        print(" ** patch_rgb_panel_header: file not found, skipping **")
+        return
+
+    with open(target, "r") as f:
+        content = f.read()
+
+    sentinel = "// [HH-PATCHED]"
+    if sentinel in content:
+        print(" ** Arduino_ESP32RGBPanel.h already patched **")
+        return
+
+    # The broken line introduced in GFX 1.6.1 (with the trailing //Modify comment)
+    OLD = (
+        "//#if (!defined(ESP_ARDUINO_VERSION_MAJOR)) || (ESP_ARDUINO_VERSION_MAJOR < 3)\n"
+        "#if (!defined(ESP_ARDUINO_VERSION_MAJOR)) || (ESP_ARDUINO_VERSION_MAJOR >5)  //Modify\n"
+    )
+    NEW = (
+        sentinel + ": restored Arduino 2.x struct guard (GFX 1.6.1 header bug)\n"
+        "#if (!defined(ESP_ARDUINO_VERSION_MAJOR)) || (ESP_ARDUINO_VERSION_MAJOR < 3)\n"
+    )
+
+    if OLD in content:
+        content = content.replace(OLD, NEW)
+        with open(target, "w") as f:
+            f.write(content)
+        print(" ** Patched Arduino_ESP32RGBPanel.h: restored < 3 guard **")
+    else:
+        print(" ** WARNING: Arduino_ESP32RGBPanel.h patch pattern not found — may already be correct **")
+
+patch_rgb_panel_header()

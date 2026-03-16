@@ -4130,6 +4130,10 @@ void setup() {
 
     // Show splash screen
     showSplash();
+    // Flush framebuffer to PSRAM so the DMA-driven display shows the splash.
+    // Required because auto_flush=false is used to avoid per-pixel
+    // Cache_WriteBack_Addr calls that cause WDT on OPI PSRAM + IDF 4.4.
+    tft.flush();
 
     // Initialize subsystems
     Serial.println("[INIT] Initializing subsystems...");
@@ -4324,5 +4328,6 @@ void setup() {
 
 void loop() {
     handleButtons();
+    tft.flush();  // push any pending draws to PSRAM so DMA shows latest pixels
     delay(20);
 }

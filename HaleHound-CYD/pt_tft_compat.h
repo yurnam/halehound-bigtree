@@ -236,6 +236,16 @@ public:
     void writecommand(uint8_t /*c*/) {}
     void writedata(uint8_t /*d*/)    {}
 
+    // flush() — push CPU cache to PSRAM so the DMA sees the latest pixels.
+    // Must be called after each complete screen update when auto_flush=false.
+    // Internally calls Cache_WriteBack_Addr() (an ESP-IDF ROM function that
+    // writes dirty CPU cache lines back to PSRAM) once for the full 800×480×2
+    // = 768 KB framebuffer — ~5 ms on OPI PSRAM at 80 MHz.  This is far
+    // cheaper than the per-pixel path (76,800 × ~100 µs = 7.68 s → WDT).
+    void flush() {
+        if (_gfx) _gfx->flush();
+    }
+
     // ── Touch ─────────────────────────────────────────────────────────────
     // getTouch() is used in touch_buttons.cpp to read raw touch coordinates.
     // The threshold parameter is ignored (GT911 is capacitive).
@@ -428,8 +438,13 @@ private:
             // 10 lines × 800px = 8000px = 16KB bounce buffer: LCD_CAM copies PSRAM→SRAM
             // so DMA reads from cache-coherent internal SRAM; fixes RGB cycling + WDT
             PT_LCD_RENDER_BOUNCE_LINES * PT_LCD_H_RES /*bounce_buffer_size_px*/);
+        // auto_flush = false: no per-pixel Cache_WriteBack_Addr (CPU-cache→PSRAM flush) calls.
+        // On ESP32-S3 OPI PSRAM + IDF 4.4, each per-pixel flush takes ~100 µs;
+        // drawing a 240×320 bitmap fires 76,800 flushes = 7.68 s → WDT.
+        // We flush the entire framebuffer at once (see flush() below) which is
+        // a single ~5 ms bulk flush of the 768 KB framebuffer.
         static Arduino_RGB_Display gfx(PT_LCD_H_RES, PT_LCD_V_RES,
-                                       &rgbpanel, 0, true);
+                                       &rgbpanel, 0, false /*auto_flush*/);
         _gfx = &gfx;
         bool ok = _gfx->begin();
         if (!ok) {
@@ -442,6 +457,7 @@ private:
         }
         Serial.println("[TFT] RGB display initialised OK");
         _gfx->fillScreen(TFT_BLACK);
+        _gfx->flush();  // push initial black frame to PSRAM so DMA shows black immediately
         _gfx->setRotation(_rotation);
         _gfx->setTextSize(_textSize);
 
