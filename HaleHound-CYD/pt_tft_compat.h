@@ -1,19 +1,24 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // pt_tft_compat.h  —  TFT_eSPI compatibility shim for PandaTouch
 //
-// Pre-included via  -include pt_tft_compat.h  in the pandatouch build flags.
+// Pre-included via  build_src_flags: -include pt_tft_compat.h  so it applies
+// only to project source files, not to library compilation units.
 // Provides the same  TFT_eSPI  class API used throughout HaleHound-CYD but
 // backed by Arduino_GFX (RGB-parallel LCD) and TAMC_GT911 (I²C touch).
 //
-// The header guard  _TFT_eSPI_H_  prevents the real TFT_eSPI library header
-// from loading when any source file does  #include <TFT_eSPI.h>.
+// Defines  _TFT_eSPIH_  (the actual include guard in TFT_eSPI.h v2.5.43 —
+// note: no underscore before H) so that any  #include <TFT_eSPI.h>  in
+// project source files is blocked and our replacement class is used instead.
 // ═══════════════════════════════════════════════════════════════════════════
 
 #pragma once
 
 // Claim the TFT_eSPI header guard so that any later #include <TFT_eSPI.h>
 // in source files skips the real library class (we provide our own below).
-#define _TFT_eSPI_H_
+// NOTE: TFT_eSPI.h v2.5.43 uses _TFT_eSPIH_ (no underscore before H) as its
+// guard — this is the macro we must define.  _TFT_eSPI_H_ (with underscore)
+// is a different macro and has no effect on TFT_eSPI.h's include guard.
+#define _TFT_eSPIH_
 
 // ── Standard includes ───────────────────────────────────────────────────────
 #include <Arduino.h>
@@ -23,6 +28,27 @@
 
 // ── Arduino_GFX (RGB-parallel display + GFXfont type) ──────────────────────
 #include <Arduino_GFX_Library.h>
+
+// ── Undefine Arduino_GFX short-name colour macros ──────────────────────────
+// Arduino_GFX.h defines generic colour names (RED, GREEN, BLUE, …) as
+// function-like macro calls such as  #define RED RGB565(255,0,0).
+// These clash with  const uint16_t RED = …  declarations in shared.h and
+// with the #define aliases in that file, causing compile errors in every
+// project source file.  We keep the RGB565_* long names; only the short
+// aliases are removed here.  The TFT_* palette added by our class below
+// covers all colours the firmware actually references.
+#undef RED
+#undef GREEN
+#undef BLUE
+#undef BLACK
+#undef WHITE
+#undef GRAY
+#undef ORANGE
+#undef YELLOW
+#undef CYAN
+#undef MAGENTA
+#undef PURPLE
+#undef PINK
 
 // ── GT911 capacitive touch ──────────────────────────────────────────────────
 #include <TAMC_GT911.h>
