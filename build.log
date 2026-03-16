@@ -12,6 +12,7 @@ Processing pandatouch (platform: espressif32@6.12.0; board: esp32-s3-devkitc-1; 
 --------------------------------------------------------------------------------
 Verbose mode can be enabled via `-v, --verbose` option
  ** Custom skip build targets **  */Arduino_ESP32LCD8.cpp */Arduino_ESP32QSPI.cpp
+ ** WARNING: Arduino_ESP32RGBPanel.h patch pattern not found — may already be correct **
 CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/esp32-s3-devkitc-1.html
 PLATFORM: Espressif 32 (6.12.0) > Espressif ESP32-S3-DevKitC-1-N8 (8 MB QD, No PSRAM)
 HARDWARE: ESP32S3 240MHz, 320KB RAM, 16MB Flash
@@ -56,40 +57,7 @@ Dependency Graph
 Skipping /home/martin/halehound-bigtree/HaleHound-CYD/.pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_ESP32LCD8.cpp
 Skipping /home/martin/halehound-bigtree/HaleHound-CYD/.pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_ESP32QSPI.cpp
 Building in release mode
-Compiling .pio/build/pandatouch/src/CYD28_TouchscreenR.cpp.o
 Compiling .pio/build/pandatouch/src/HaleHound-CYD.ino.cpp.o
-Compiling .pio/build/pandatouch/src/bluetooth_attacks.cpp.o
-Compiling .pio/build/pandatouch/src/eapol_capture.cpp.o
-Compiling .pio/build/pandatouch/src/firmware_update.cpp.o
-Compiling .pio/build/pandatouch/src/gps_module.cpp.o
-Compiling .pio/build/pandatouch/src/iot_recon.cpp.o
-Compiling .pio/build/pandatouch/src/jam_detect.cpp.o
-Compiling .pio/build/pandatouch/src/karma_attack.cpp.o
-Compiling .pio/build/pandatouch/src/loot_manager.cpp.o
-Compiling .pio/build/pandatouch/src/nrf24_attacks.cpp.o
-Compiling .pio/build/pandatouch/src/nrf24_config.cpp.o
-Compiling .pio/build/pandatouch/src/radio_test.cpp.o
-Compiling .pio/build/pandatouch/src/rfid_attacks.cpp.o
-Compiling .pio/build/pandatouch/src/saved_captures.cpp.o
-Compiling .pio/build/pandatouch/src/serial_monitor.cpp.o
-Compiling .pio/build/pandatouch/src/spi_manager.cpp.o
-In file included from .pio/libdeps/pandatouch/RF24/RF24.h:18,
-                 from nrf24_config.h:11,
-                 from bluetooth_attacks.cpp:12:
-.pio/libdeps/pandatouch/RF24/RF24_config.h:23: warning: "FAILURE_HANDLING" redefined
- #define FAILURE_HANDLING
- 
-<command-line>: note: this is the location of the previous definition
-Compiling .pio/build/pandatouch/src/subconfig.cpp.o
-Compiling .pio/build/pandatouch/src/subghz_attacks.cpp.o
-Compiling .pio/build/pandatouch/src/touch_buttons.cpp.o
-Compiling .pio/build/pandatouch/src/utils.cpp.o
-Compiling .pio/build/pandatouch/src/wardriving.cpp.o
-Compiling .pio/build/pandatouch/src/wardriving_screen.cpp.o
-Compiling .pio/build/pandatouch/src/wifi_attacks.cpp.o
-Compiling .pio/build/pandatouch/src/wp_loot_viewer.cpp.o
-Building .pio/build/pandatouch/bootloader.bin
-Generating partitions .pio/build/pandatouch/partitions.bin
 In file included from .pio/libdeps/pandatouch/RF24/RF24.h:18,
                  from nrf24_config.h:11,
                  from /home/martin/halehound-bigtree/HaleHound-CYD/HaleHound-CYD.ino:32:
@@ -97,98 +65,22 @@ In file included from .pio/libdeps/pandatouch/RF24/RF24.h:18,
  #define FAILURE_HANDLING
  
 <command-line>: note: this is the location of the previous definition
-In file included from .pio/libdeps/pandatouch/RF24/RF24.h:18,
-                 from nrf24_config.h:11,
-                 from nrf24_config.cpp:7:
-.pio/libdeps/pandatouch/RF24/RF24_config.h:23: warning: "FAILURE_HANDLING" redefined
- #define FAILURE_HANDLING
- 
-<command-line>: note: this is the location of the previous definition
-In file included from .pio/libdeps/pandatouch/RF24/RF24.h:18,
-                 from nrf24_config.h:11,
-                 from nrf24_attacks.cpp:19:
-.pio/libdeps/pandatouch/RF24/RF24_config.h:23: warning: "FAILURE_HANDLING" redefined
- #define FAILURE_HANDLING
- 
-<command-line>: note: this is the location of the previous definition
-esptool.py v4.9.0
-Creating esp32s3 image...
-Merged 1 ELF section
-Successfully created esp32s3 image.
-Compiling .pio/build/pandatouch/libf9f/SPI/SPI.cpp.o
-Compiling .pio/build/pandatouch/libf29/FS/FS.cpp.o
-Compiling .pio/build/pandatouch/libf29/FS/vfs_api.cpp.o
-Compiling .pio/build/pandatouch/lib11c/SPIFFS/SPIFFS.cpp.o
-Compiling .pio/build/pandatouch/lib3ab/LittleFS/LittleFS.cpp.o
-Compiling .pio/build/pandatouch/lib7c3/TFT_eSPI/TFT_eSPI.cpp.o
-Archiving .pio/build/pandatouch/libf9f/libSPI.a
-Indexing .pio/build/pandatouch/libf9f/libSPI.a
-Compiling .pio/build/pandatouch/libb47/Wire/Wire.cpp.o
-In function 'void EapolCapture::drawCaptureScreen()',
-    inlined from 'void EapolCapture::loop()' at eapol_capture.cpp:1237:30:
-eapol_capture.cpp:872:12: warning: 'char* strncpy(char*, const char*, size_t)' writing 18 bytes into a region of size 17 overflows the destination [-Wstringop-overflow=]
-     strncpy(titleSSID, apList[selectedAP].ssid, maxTitle);
-     ~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/Arduino_DataBus.cpp.o
-In file included from .pio/libdeps/pandatouch/TFT_eSPI/TFT_eSPI.cpp:16:
-.pio/libdeps/pandatouch/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
-       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
-        ^~~~~~~
-Archiving .pio/build/pandatouch/lib11c/libSPIFFS.a
-Indexing .pio/build/pandatouch/lib11c/libSPIFFS.a
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/Arduino_G.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/Arduino_GFX.cpp.o
-Archiving .pio/build/pandatouch/lib3ab/libLittleFS.a
-Indexing .pio/build/pandatouch/lib3ab/libLittleFS.a
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/Arduino_GFX_Library.cpp.o
-Archiving .pio/build/pandatouch/libf29/libFS.a
-Indexing .pio/build/pandatouch/libf29/libFS.a
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/Arduino_OLED.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/Arduino_TFT.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/Arduino_TFT_18bit.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/canvas/Arduino_Canvas.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/canvas/Arduino_Canvas_3bit.cpp.o
-Archiving .pio/build/pandatouch/libb47/libWire.a
-Indexing .pio/build/pandatouch/libb47/libWire.a
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/canvas/Arduino_Canvas_Indexed.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/canvas/Arduino_Canvas_Mono.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_AVRPAR16.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_AVRPAR8.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_DUEPAR16.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_ESP32DSIPanel.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_ESP32LCD16.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_ESP32PAR16.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_ESP32PAR16Q.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_ESP32PAR16QQ.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_ESP32PAR8.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_ESP32PAR8Q.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_ESP32PAR8QQ.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_ESP32PAR8QQQ.cpp.o
 Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_ESP32RGBPanel.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_ESP32S2PAR16.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_ESP32S2PAR16Q.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_ESP32S2PAR8.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_ESP32S2PAR8Q.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_ESP32SPI.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_ESP32SPIDMA.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_ESP8266SPI.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_HWSPI.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_NRFXSPI.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_RPiPicoPAR16.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_RPiPicoPAR8.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_RPiPicoSPI.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_RTLPAR8.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_STM32PAR8.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_SWPAR16.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_SWPAR8.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_SWSPI.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_UNOPAR8.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_Wire.cpp.o
+Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/display/Arduino_ILI9342.cpp.o
+Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/display/Arduino_ILI9481_18bit.cpp.o
+Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/display/Arduino_ILI9486.cpp.o
+Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/display/Arduino_ILI9486_18bit.cpp.o
+Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/display/Arduino_ILI9488.cpp.o
+Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/display/Arduino_ILI9488_18bit.cpp.o
+Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/display/Arduino_ILI9488_3bit.cpp.o
+Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/display/Arduino_ILI9806.cpp.o
+Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/display/Arduino_JBT6K71.cpp.o
+Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/display/Arduino_JD9613.cpp.o
+Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/display/Arduino_NT35310.cpp.o
 .pio/libdeps/pandatouch/GFX Library for Arduino/src/databus/Arduino_ESP32RGBPanel.cpp: In member function 'uint16_t* Arduino_ESP32RGBPanel::getFrameBuffer(int16_t, int16_t)':
 .pio/libdeps/pandatouch/GFX Library for Arduino/src/databus/Arduino_ESP32RGBPanel.cpp:147:3: error: 'esp_rgb_panel_t' was not declared in this scope
    esp_rgb_panel_t *_rgb_panel;
    ^~~~~~~~~~~~~~~
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_XCA9554SWSPI.cpp.o
 .pio/libdeps/pandatouch/GFX Library for Arduino/src/databus/Arduino_ESP32RGBPanel.cpp:147:3: note: suggested alternative: 'esp_lcd_panel_t'
    esp_rgb_panel_t *_rgb_panel;
    ^~~~~~~~~~~~~~~
@@ -196,6 +88,7 @@ Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_X
 .pio/libdeps/pandatouch/GFX Library for Arduino/src/databus/Arduino_ESP32RGBPanel.cpp:147:20: error: '_rgb_panel' was not declared in this scope
    esp_rgb_panel_t *_rgb_panel;
                     ^~~~~~~~~~
+Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/display/Arduino_NT35510.cpp.o
 In file included from /home/martin/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/stdio.h:35,
                  from /home/martin/.platformio/packages/framework-arduinoespressif32/cores/esp32/Arduino.h:27,
                  from .pio/libdeps/pandatouch/GFX Library for Arduino/src/Arduino_DataBus.h:8,
@@ -220,13 +113,12 @@ In file included from /home/martin/.platformio/packages/toolchain-xtensa-esp32s3
 .pio/libdeps/pandatouch/GFX Library for Arduino/src/databus/Arduino_ESP32RGBPanel.cpp:148:45: error: 'esp_rgb_panel_t' does not name a type; did you mean 'esp_lcd_panel_t'?
    _rgb_panel = __containerof(_panel_handle, esp_rgb_panel_t, base);
                                              ^~~~~~~~~~~~~~~
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_XL9535SWSPI.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_mbedSPI.cpp.o
-Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/display/Arduino_AXS15231B.cpp.o
+Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/display/Arduino_NT39125.cpp.o
+Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/display/Arduino_NV3007.cpp.o
 *** [.pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_ESP32RGBPanel.cpp.o] Error 1
-========================== [FAILED] Took 3.51 seconds ==========================
+========================== [FAILED] Took 2.14 seconds ==========================
 
 Environment    Status    Duration
 -------------  --------  ------------
-pandatouch     FAILED    00:00:03.508
-==================== 1 failed, 0 succeeded in 00:00:03.508 ====================
+pandatouch     FAILED    00:00:02.145
+==================== 1 failed, 0 succeeded in 00:00:02.145 ====================
