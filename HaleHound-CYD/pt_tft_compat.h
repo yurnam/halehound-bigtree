@@ -422,8 +422,12 @@ private:
             0 /*vsync_pol*/, PT_LCD_VSYNC_PULSE_WIDTH,
             PT_LCD_VSYNC_BACK_PORCH, PT_LCD_VSYNC_FRONT_PORCH,
             1 /*pclk_active_neg*/,
-            PT_LCD_PCLK_HZ, false /*useBigEndian*/
-        );
+            PT_LCD_PCLK_HZ, false /*useBigEndian*/,
+            // DE and PCLK idle LOW is standard for this panel's DE-mode timing
+            0 /*de_idle_high*/, 0 /*pclk_idle_high*/,
+            // 10 lines × 800px = 8000px = 16KB bounce buffer: LCD_CAM copies PSRAM→SRAM
+            // so DMA reads from cache-coherent internal SRAM; fixes RGB cycling + WDT
+            PT_LCD_RENDER_BOUNCE_LINES * PT_LCD_H_RES /*bounce_buffer_size_px*/);
         static Arduino_RGB_Display gfx(PT_LCD_H_RES, PT_LCD_V_RES,
                                        &rgbpanel, 0, true);
         _gfx = &gfx;
