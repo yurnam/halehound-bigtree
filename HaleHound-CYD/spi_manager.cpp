@@ -117,8 +117,11 @@ void spiManagerSetup() {
     #endif
     #endif
 
-    // Initialize VSPI bus
+    // Initialize VSPI bus — skip on PandaTouch (no SPI radio modules; VSPI pins are -1
+    // and would default to LCD data-bus GPIOs on ESP32-S3)
+    #if !defined(PANDATOUCH)
     SPI.begin(VSPI_SCK, VSPI_MISO, VSPI_MOSI);
+    #endif
 
     currentDevice = SPI_DEVICE_NONE;
     busLocked = false;
