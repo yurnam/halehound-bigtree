@@ -188,4 +188,52 @@
 #define CYD_DEBUG      1
 #define CYD_DEBUG_BAUD 115200
 
+// ── Firmware version ────────────────────────────────────────────────────────
+#define FW_VERSION      "v3.4.0"
+#define FW_FULL_VERSION FW_VERSION " " FW_EDITION
+
+// ── Backlight alias (code references CYD_TFT_BL; shim drives it via LEDC) ──
+#define CYD_TFT_BL      PT_LCD_BL_PIN
+
+// ── Icon bar (top navigation strip) — same Y values as CYD_35 (480px tall) ─
+#define ICON_BAR_TOP      19
+#define ICON_BAR_Y        20
+#define ICON_BAR_BOTTOM   36
+#define ICON_BAR_H        16
+#define CONTENT_Y_START   38
+
+// Icon bar touch zones — generous (large 7" screen, fat-finger friendly)
+#define ICON_BAR_TOUCH_TOP     0
+#define ICON_BAR_TOUCH_BOTTOM  55
+
+// ── Padded content area ──────────────────────────────────────────────────────
+#define CONTENT_PADDED_X    5
+#define CONTENT_PADDED_W    (CYD_SCREEN_WIDTH - 10)
+#define CONTENT_INNER_X     10
+#define CONTENT_INNER_W     (CYD_SCREEN_WIDTH - 20)
+
+// ── Graph / visualisation areas ──────────────────────────────────────────────
+#define GRAPH_FULL_W        (CYD_SCREEN_WIDTH - 4)
+#define GRAPH_PADDED_W      (CYD_SCREEN_WIDTH - 10)
+
+// ── Menu layout ──────────────────────────────────────────────────────────────
+#define MENU_COLUMN_W       (CYD_SCREEN_WIDTH / 2)
+#define MENU_COL_LEFT_X     10
+#define MENU_COL_RIGHT_X    (MENU_COL_LEFT_X + MENU_COLUMN_W)
+
+// ── Dialog boxes ─────────────────────────────────────────────────────────────
+#define DIALOG_W            (CYD_SCREEN_WIDTH - 20)
+#define DIALOG_X            10
+#define DIALOG_CENTER_X     (CYD_SCREEN_WIDTH / 2)
+
+// ── Bottom area positions ─────────────────────────────────────────────────────
+#define BOTTOM_HINT_Y       (CYD_SCREEN_HEIGHT - 45)
+#define BOTTOM_NAV_Y        (CYD_SCREEN_HEIGHT - 33)
+
+// ── Button bar ───────────────────────────────────────────────────────────────
+#define BUTTON_BAR_Y        (CYD_SCREEN_HEIGHT - 37)
+#define BUTTON_BAR_H        37
+#define STATUS_LINE_Y       (CYD_SCREEN_HEIGHT - 18)
+#define CONTENT_BOTTOM      (BUTTON_BAR_Y - 2)
+
 #endif // PT_CONFIG_H
