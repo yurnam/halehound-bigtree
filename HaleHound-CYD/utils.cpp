@@ -487,6 +487,9 @@ void loadSettings() {
         extern bool touch_calibrated;
 
         touch_calibrated = (settings.touchCalibrated == 1);
+#ifdef PANDATOUCH
+        touch_calibrated = true;  // GT911 capacitive touch never needs calibration
+#endif
         touch_cal_x_source = settings.touchXSource;
         touch_cal_x_min = settings.touchXMin;
         touch_cal_x_max = settings.touchXMax;

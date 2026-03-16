@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // HaleHound PandaTouch Hardware Configuration
-// BigTreeTech PandaTouch — ESP32-S3, 7" 800×480 RGB LCD, GT911 capacitive touch
+// BigTreeTech PandaTouch — ESP32-S3, 5" 800×480 RGB LCD, GT911 capacitive touch
 //
 // WiFi + Bluetooth only.  No SPI radio modules are wired — the PandaTouch
 // exposes only a secondary I²C header which is not used in this release.
@@ -13,7 +13,7 @@
 #define PT_CONFIG_H
 
 // ── Identity ────────────────────────────────────────────────────────────────
-#define CYD_BOARD_NAME  "HaleHound-PandaTouch 7\""
+#define CYD_BOARD_NAME  "HaleHound-PandaTouch 5\""
 #define FW_EDITION      "PandaTouch Edition"
 #define FW_DEVICE       "HaleHound-PandaTouch"
 
@@ -202,7 +202,7 @@
 #define ICON_BAR_H        16
 #define CONTENT_Y_START   38
 
-// Icon bar touch zones — generous (large 7" screen, fat-finger friendly)
+// Icon bar touch zones — generous (large 5" screen, fat-finger friendly)
 #define ICON_BAR_TOUCH_TOP     0
 #define ICON_BAR_TOUCH_BOTTOM  55
 

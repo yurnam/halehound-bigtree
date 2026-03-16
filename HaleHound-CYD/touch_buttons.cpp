@@ -248,7 +248,7 @@ void runTouchTest() {
     tft.setTextSize(2);
     tft.setCursor(10, 5);
 #ifdef PANDATOUCH
-    tft.println("TOUCH TEST 7\" (GT911)");
+    tft.println("TOUCH TEST 5\" (GT911)");
 #elif defined(CYD_35)
     tft.println("TOUCH TEST 3.5\"");
 #else
@@ -398,7 +398,8 @@ bool peekTouchPoint(uint16_t *x, uint16_t *y) {
 
 bool getTouchPoint(uint16_t *x, uint16_t *y) {
 #if defined(CYD_35) || defined(PANDATOUCH)
-    // XPT2046 resistive = polled, no edge-trigger needed (same as 2.8")
+    // CYD_35 uses XPT2046 resistive touch (polled, no edge-trigger needed).
+    // PandaTouch uses GT911 capacitive touch (also polled via the shim).
     // Debounce handled by callers (lastTap checks, delay(), etc.)
     uint16_t tx, ty;
     if (!tft.getTouch(&tx, &ty, TFT_TOUCH_THRESHOLD)) return false;
@@ -1268,7 +1269,9 @@ String getButtonName(ButtonID btn) {
 void printTouchDebug() {
     #if CYD_DEBUG
     Serial.println("═══════════════════════════════════════");
-#if defined(CYD_35) || defined(PANDATOUCH)
+#ifdef PANDATOUCH
+    Serial.println("         TOUCH DEBUG (GT911 I2C)");
+#elif defined(CYD_35)
     Serial.println("         TOUCH DEBUG (XPT2046 TFT_eSPI)");
 #else
     Serial.println("         TOUCH DEBUG (XPT2046)");

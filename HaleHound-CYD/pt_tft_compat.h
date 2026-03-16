@@ -64,6 +64,25 @@
 #include <Fonts/GFXFF/FreeMonoBold12pt7b.h>
 #include <Fonts/GFXFF/FreeMonoBold18pt7b.h>
 
+// ── LEDC / backlight compatibility macros ─────────────────────────────────
+// The shim's _initBacklight() configures LEDC_CHANNEL_0 directly via the
+// ESP-IDF API (11-bit resolution, 30 kHz, LEDC_TIMER_1).  The Arduino-layer
+// ledcSetup()/ledcAttachPin() calls in setup() would conflict with that
+// configuration and, if allowed to execute, also reconfigure the GPIO matrix
+// for the backlight pin which can disrupt the IDF-level setup.
+// Solution:
+//   • ledcSetup / ledcAttachPin → no-ops (backlight already configured)
+//   • ledcWrite(ch, 8-bit duty) → IDF ledc_set_duty (scales 0-255 → 0-2047)
+//     so brightness changes throughout the firmware continue to work.
+static inline void _pt_set_brightness(uint32_t duty8) {
+    uint32_t duty11 = duty8 * 2047UL / 255UL;
+    ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, duty11);
+    ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+}
+#define ledcSetup(ch, freq, bits)   ((void)0)
+#define ledcAttachPin(pin, ch)      ((void)0)
+#define ledcWrite(ch, duty)         _pt_set_brightness((uint32_t)(duty))
+
 // ── TFT colour constants (RGB565) ──────────────────────────────────────────
 #define TFT_BLACK       0x0000
 #define TFT_NAVY        0x000F

@@ -17,7 +17,7 @@
 # Target device:  BigTreeTech PandaTouch
 #   MCU:          ESP32-S3 (dual-core LX7, 240 MHz)
 #   PSRAM:        8 MB OPI
-#   Display:      7" 800×480 RGB-parallel LCD (16-bit)
+#   Display:      5" 800×480 RGB-parallel LCD (16-bit)
 #   Touch:        GT911 capacitive (I²C)
 #   Features:     WiFi + Bluetooth (no external radio modules)
 # ═══════════════════════════════════════════════════════════════════════════
@@ -90,7 +90,7 @@ echo "  ███████║███████║██║     ███�
 echo "  ██╔══██║██╔══██║██║     ██╔══╝  ██╔══██║██║   ██║██║   ██║██║╚██╗██║██║  ██║"
 echo "  ██║  ██║██║  ██║███████╗███████╗██║  ██║╚██████╔╝╚██████╔╝██║ ╚████║██████╔╝"
 echo "  ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚═════╝ "
-echo "  PandaTouch Edition  —  ESP32-S3  |  7\" 800×480  |  GT911  |  WiFi + BT"
+echo "  PandaTouch Edition  —  ESP32-S3  |  5\" 800×480  |  GT911  |  WiFi + BT"
 echo -e "${RESET}"
 
 check_pio
