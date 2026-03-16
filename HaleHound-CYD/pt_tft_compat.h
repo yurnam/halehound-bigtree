@@ -10,7 +10,9 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 #pragma once
-#ifndef _TFT_eSPI_H_
+
+// Claim the TFT_eSPI header guard so that any later #include <TFT_eSPI.h>
+// in source files skips the real library class (we provide our own below).
 #define _TFT_eSPI_H_
 
 // ── Standard includes ───────────────────────────────────────────────────────
@@ -442,5 +444,3 @@ private:
         }
     }
 };
-
-#endif // _TFT_eSPI_H_
