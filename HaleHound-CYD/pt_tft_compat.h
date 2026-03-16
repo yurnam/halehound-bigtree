@@ -337,19 +337,22 @@ public:
 
     size_t print(const char *str)    { return _gfx ? _gfx->print(str)    : 0; }
     size_t print(const String &str)  { return _gfx ? _gfx->print(str)    : 0; }
-    size_t print(int   v, int base=10){ return _gfx ? _gfx->print(v,base) : 0; }
-    size_t print(long  v, int base=10){ return _gfx ? _gfx->print(v,base) : 0; }
-    size_t print(unsigned v, int base=10){return _gfx? _gfx->print(v,base): 0; }
-    size_t print(float v, int d=2)   { return _gfx ? _gfx->print(v,d)    : 0; }
-    size_t print(double v, int d=2)  { return _gfx ? _gfx->print(v,d)    : 0; }
-    size_t print(char c)             { return _gfx ? _gfx->print(c)      : 0; }
+    size_t print(int            v, int base=10){ return _gfx ? _gfx->print(v,base) : 0; }
+    size_t print(long           v, int base=10){ return _gfx ? _gfx->print(v,base) : 0; }
+    size_t print(unsigned       v, int base=10){ return _gfx ? _gfx->print(v,base) : 0; }
+    size_t print(unsigned long  v, int base=10){ return _gfx ? _gfx->print(v,base) : 0; }
+    size_t print(float  v, int d=2)            { return _gfx ? _gfx->print(v,d)    : 0; }
+    size_t print(double v, int d=2)            { return _gfx ? _gfx->print(v,d)    : 0; }
+    size_t print(char   c)                     { return _gfx ? _gfx->print(c)      : 0; }
 
-    size_t println(const char *str)   { return _gfx ? _gfx->println(str)   : 0; }
-    size_t println(const String &str) { return _gfx ? _gfx->println(str)   : 0; }
-    size_t println(int   v, int b=10) { return _gfx ? _gfx->println(v,b)   : 0; }
-    size_t println(long  v, int b=10) { return _gfx ? _gfx->println(v,b)   : 0; }
-    size_t println(float v, int d=2)  { return _gfx ? _gfx->println(v,d)   : 0; }
-    size_t println()                  { return _gfx ? _gfx->println()       : 0; }
+    size_t println(const char *str)            { return _gfx ? _gfx->println(str)   : 0; }
+    size_t println(const String &str)          { return _gfx ? _gfx->println(str)   : 0; }
+    size_t println(int           v, int b=10)  { return _gfx ? _gfx->println(v,b)   : 0; }
+    size_t println(long          v, int b=10)  { return _gfx ? _gfx->println(v,b)   : 0; }
+    size_t println(unsigned      v, int b=10)  { return _gfx ? _gfx->println(v,b)   : 0; }
+    size_t println(unsigned long v, int b=10)  { return _gfx ? _gfx->println(v,b)   : 0; }
+    size_t println(float  v, int d=2)          { return _gfx ? _gfx->println(v,d)   : 0; }
+    size_t println()                           { return _gfx ? _gfx->println()       : 0; }
 
     size_t printf(const char *fmt, ...) {
         if (!_gfx) return 0;
