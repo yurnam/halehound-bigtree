@@ -427,7 +427,16 @@ private:
         static Arduino_RGB_Display gfx(PT_LCD_H_RES, PT_LCD_V_RES,
                                        &rgbpanel, 0, true);
         _gfx = &gfx;
-        _gfx->begin();
+        bool ok = _gfx->begin();
+        if (!ok) {
+            // Most common cause: PSRAM not accessible — ps_malloc(768KB) failed.
+            // Ensure board_build.arduino.memory_type = qio_opi and
+            // espressif32@6.12.0+ are used so OPI PSRAM initialises correctly.
+            Serial.println("[TFT] ERROR: Arduino_RGB_Display::begin() failed — "
+                           "check PSRAM (need espressif32@6.12.0+, memory_type=qio_opi)");
+            return;
+        }
+        Serial.println("[TFT] RGB display initialised OK");
         _gfx->fillScreen(TFT_BLACK);
         _gfx->setRotation(_rotation);
         _gfx->setTextSize(_textSize);
