@@ -12,7 +12,7 @@
 
 #include <Arduino.h>
 #include <SPI.h>
-#ifndef CYD_35
+#if !defined(CYD_35) && !defined(PANDATOUCH)
   #include "CYD28_TouchscreenR.h"
 #endif
 #include <TFT_eSPI.h>

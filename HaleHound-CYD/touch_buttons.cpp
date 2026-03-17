@@ -5,12 +5,13 @@
 // to avoid VSPI conflict with NRF24/CC1101 radios. Proven working approach.
 // Created: 2026-02-06
 // Updated: 2026-02-11 - Switched to Piotr Zapart's CYD28_TouchscreenR library
+// Updated: 2026-03-16 - Added PANDATOUCH (GT911 I²C) support
 // ═══════════════════════════════════════════════════════════════════════════
 
 #include "touch_buttons.h"
 #include "icon.h"
 #include "shared.h"
-#ifndef CYD_35
+#if !defined(CYD_35) && !defined(PANDATOUCH)
   #include "CYD28_TouchscreenR.h"
 #endif
 #ifdef CYD_35
@@ -21,24 +22,23 @@
 // TOUCH CONTROLLER INSTANCE
 // ═══════════════════════════════════════════════════════════════════════════
 
-#ifdef CYD_35
-// E32R35T: XPT2046 resistive touch via TFT_eSPI built-in driver
-// Touch shares HSPI with LCD — managed by TFT_eSPI via TOUCH_CS define
-// Calibration data stored in NVS (Preferences)
+#if defined(CYD_35) || defined(PANDATOUCH)
+// ── CYD_35 (XPT2046 via TFT_eSPI) or PandaTouch (GT911 via TFT_eSPI shim) ─
+// Both use tft.getTouch() for raw coordinates and share the same
+// edge-trigger logic (_touchFired).  GT911 is initialised inside
+// TFT_eSPI::init() so no extra setup is needed here.
 static uint16_t tftCalData[5] = {0};
 static bool _touchCalLoaded = false;
 static bool _touchFired = false;
 
-// Touch threshold for tft.getTouch() — XPT2046 Z pressure minimum
-// TFT_eSPI default is 600 but that's way too stiff for the E32R35T panel
-// 100 filters noise while allowing light taps
+// Threshold passed to tft.getTouch() — ignored by the GT911 shim
 static const uint16_t TFT_TOUCH_THRESHOLD = 100;
 
 void consumeTouch() {
     _touchFired = true;
 }
 
-// Block until finger lifts off XPT2046
+// Block until the finger leaves the screen
 void waitForTouchRelease() {
     delay(30);
     uint16_t tx, ty;
@@ -50,9 +50,7 @@ void waitForTouchRelease() {
     _touchFired = false;
 }
 #else
-// CYD28 resistive touch (software SPI) — needs calibration
-// Uses software SPI when begin() is called without SPI parameter
-// Portrait mode (240x320) to match TFT rotation 0
+// ── CYD28: XPT2046 resistive touch via software bit-banged SPI ───────────
 CYD28_TouchR touch(CYD_SCREEN_WIDTH, CYD_SCREEN_HEIGHT);
 
 // No edge-trigger on resistive touch — consumeTouch is a no-op
@@ -82,7 +80,7 @@ static ButtonEvent currentEvent;
 static bool touchFeedbackEnabled = false;
 static bool initialized = false;
 
-#ifndef CYD_35
+#if !defined(CYD_35) && !defined(PANDATOUCH)
 // Touch calibration globals — loaded from EEPROM by loadSettings()
 // Defaults match Jesse's board (rawY→screenX, rawX→screenY)
 uint8_t touch_cal_x_source = 1;      // 0=rawX, 1=rawY → screenX
@@ -94,7 +92,6 @@ uint16_t touch_cal_y_max = 3700;     // source raw value → screenY=319
 bool touch_calibrated = false;        // true if user has run calibration
 
 // Helper: map raw touch point to screenX using calibration
-// Uses tft.width() so mapping adapts to current rotation automatically
 int touchMapX(CYD28_TS_Point &p) {
     int raw = touch_cal_x_source ? p.y : p.x;
     int maxX = tft.width() - 1;
@@ -103,14 +100,13 @@ int touchMapX(CYD28_TS_Point &p) {
 }
 
 // Helper: map raw touch point to screenY using calibration
-// Uses tft.height() so mapping adapts to current rotation automatically
 int touchMapY(CYD28_TS_Point &p) {
     int raw = touch_cal_y_source ? p.y : p.x;
     int maxY = tft.height() - 1;
     int val = map(raw, touch_cal_y_min, touch_cal_y_max, 0, maxY);
     return constrain(val, 0, maxY);
 }
-#else
+#elif defined(CYD_35)
 // E32R35T: TFT_eSPI handles calibration via calData[5] — stubs for EEPROM compatibility
 uint8_t touch_cal_x_source = 0;
 uint16_t touch_cal_x_min = 0;
@@ -118,12 +114,12 @@ uint16_t touch_cal_x_max = CYD_SCREEN_WIDTH;
 uint8_t touch_cal_y_source = 0;
 uint16_t touch_cal_y_min = 0;
 uint16_t touch_cal_y_max = CYD_SCREEN_HEIGHT;
-bool touch_calibrated = false;         // Set true after NVS load or interactive calibration
+bool touch_calibrated = false;
 
 // Load TFT_eSPI touch calibration from NVS
 static bool loadTouchCalFromNVS() {
     Preferences prefs;
-    prefs.begin("touchcal", true);  // read-only
+    prefs.begin("touchcal", true);
     size_t len = prefs.getBytesLength("calData");
     if (len == sizeof(tftCalData)) {
         prefs.getBytes("calData", tftCalData, sizeof(tftCalData));
@@ -137,10 +133,22 @@ static bool loadTouchCalFromNVS() {
 // Save TFT_eSPI touch calibration to NVS
 static void saveTouchCalToNVS() {
     Preferences prefs;
-    prefs.begin("touchcal", false);  // read-write
+    prefs.begin("touchcal", false);
     prefs.putBytes("calData", tftCalData, sizeof(tftCalData));
     prefs.end();
 }
+#else // PANDATOUCH
+// GT911 capacitive touch — no resistive calibration required.
+// touch_calibrated is loaded from NVS by loadSettings() on every boot.
+// On first boot (NVS empty) it comes in as false, triggering the
+// first-boot touch verification screen in setup().
+uint8_t touch_cal_x_source = 0;
+uint16_t touch_cal_x_min = 0;
+uint16_t touch_cal_x_max = CYD_SCREEN_WIDTH;
+uint8_t touch_cal_y_source = 0;
+uint16_t touch_cal_y_min = 0;
+uint16_t touch_cal_y_max = CYD_SCREEN_HEIGHT;
+bool touch_calibrated = false;  // set to true after first-boot verification
 #endif
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -175,9 +183,18 @@ void touchButtonsSetup() {
     // Setup hardware BOOT button (GPIO0)
     pinMode(BOOT_BUTTON, INPUT_PULLUP);
 
-#ifdef CYD_35
+#ifdef PANDATOUCH
+    // GT911 capacitive touch — already initialised by tft.init() via the shim.
+    // No NVS calibration or SPI setup required.
+    // NOTE: touch_calibrated is NOT forced true here; it was loaded from NVS
+    // by loadSettings() already.  A false value triggers the first-boot
+    // verification screen in setup().
+    _touchCalLoaded = true;
+    #if CYD_DEBUG
+    Serial.println("[TOUCH] PandaTouch GT911 capacitive touch ready (via TFT_eSPI shim)");
+    #endif
+#elif defined(CYD_35)
     // E32R35T: XPT2046 resistive touch via TFT_eSPI built-in driver
-    // Touch shares HSPI with LCD — TFT_eSPI handles CS toggling via TOUCH_CS
     #if CYD_DEBUG
     Serial.println("[TOUCH] E32R35T XPT2046 init (TFT_eSPI shared HSPI, TOUCH_CS=33)");
     Serial.flush();
@@ -193,9 +210,6 @@ void touchButtonsSetup() {
                       tftCalData[0], tftCalData[1], tftCalData[2], tftCalData[3], tftCalData[4]);
         #endif
     } else {
-        // No saved calibration — TFT_eSPI has built-in defaults that work for most XPT2046 panels:
-        // x0=300, x1=3600, y0=300, y1=3600, rotate=1, invert_x=1, invert_y=0
-        // User can run calibration from Settings > Touch Calibration if needed
         touch_calibrated = false;
         #if CYD_DEBUG
         Serial.println("[TOUCH] No NVS calibration — using TFT_eSPI defaults");
@@ -207,10 +221,9 @@ void touchButtonsSetup() {
     Serial.println("[TOUCH] XPT2046 resistive touch initialized (TFT_eSPI)");
     #endif
 #else
-    // XPT2046 resistive touch — SOFTWARE BIT-BANGED SPI
-    // Calling begin() without SPI parameter = software SPI mode
+    // CYD28: XPT2046 resistive touch — SOFTWARE BIT-BANGED SPI
     touch.begin();
-    touch.setRotation(1);  // Rotation 1 - direct mapping
+    touch.setRotation(1);
 
     #if CYD_DEBUG
     Serial.println("[TOUCH] CYD28_TouchR initialized with SOFTWARE SPI");
@@ -239,7 +252,9 @@ void runTouchTest() {
     tft.setTextColor(TFT_WHITE);
     tft.setTextSize(2);
     tft.setCursor(10, 5);
-#ifdef CYD_35
+#ifdef PANDATOUCH
+    tft.println("TOUCH TEST 5\" (GT911)");
+#elif defined(CYD_35)
     tft.println("TOUCH TEST 3.5\"");
 #else
     tft.println("TOUCH TEST 2.8\"");
@@ -264,7 +279,7 @@ void runTouchTest() {
         // Clear info area at top
         tft.fillRect(0, 0, sw, 55, TFT_BLACK);
 
-#ifdef CYD_35
+#if defined(CYD_35) || defined(PANDATOUCH)
         uint16_t tx, ty;
         bool touched = tft.getTouch(&tx, &ty, TFT_TOUCH_THRESHOLD);
         tft.setTextSize(1);
@@ -348,7 +363,7 @@ void touchReinitSPI() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 bool isTouched() {
-#ifdef CYD_35
+#if defined(CYD_35) || defined(PANDATOUCH)
     uint16_t tx, ty;
     return tft.getTouch(&tx, &ty, TFT_TOUCH_THRESHOLD);
 #else
@@ -359,7 +374,7 @@ bool isTouched() {
 // Raw hardware check — bypasses edge-trigger, does NOT affect state.
 // Use ONLY for long-press detection loops.
 bool isStillTouched() {
-#ifdef CYD_35
+#if defined(CYD_35) || defined(PANDATOUCH)
     uint16_t tx, ty;
     return tft.getTouch(&tx, &ty, TFT_TOUCH_THRESHOLD);
 #else
@@ -371,7 +386,7 @@ bool isStillTouched() {
 // Use this when you need to CHECK the position before deciding to act.
 // Call consumeTouch() after your action to prevent re-fire.
 bool peekTouchPoint(uint16_t *x, uint16_t *y) {
-#ifdef CYD_35
+#if defined(CYD_35) || defined(PANDATOUCH)
     uint16_t tx, ty;
     if (!tft.getTouch(&tx, &ty, TFT_TOUCH_THRESHOLD)) {
         // Finger lifted — reset edge-trigger so next getTouchPoint() fires
@@ -387,8 +402,9 @@ bool peekTouchPoint(uint16_t *x, uint16_t *y) {
 }
 
 bool getTouchPoint(uint16_t *x, uint16_t *y) {
-#ifdef CYD_35
-    // XPT2046 resistive = polled, no edge-trigger needed (same as 2.8")
+#if defined(CYD_35) || defined(PANDATOUCH)
+    // CYD_35 uses XPT2046 resistive touch (polled, no edge-trigger needed).
+    // PandaTouch uses GT911 capacitive touch (also polled via the shim).
     // Debounce handled by callers (lastTap checks, delay(), etc.)
     uint16_t tx, ty;
     if (!tft.getTouch(&tx, &ty, TFT_TOUCH_THRESHOLD)) return false;
@@ -432,7 +448,7 @@ ButtonID getTouchZone(uint16_t x, uint16_t y) {
 
 // Get screen X coordinate (returns -1 if not touched)
 int getTouchX() {
-#ifdef CYD_35
+#if defined(CYD_35) || defined(PANDATOUCH)
     uint16_t tx, ty;
     if (!tft.getTouch(&tx, &ty, TFT_TOUCH_THRESHOLD)) return -1;
     return constrain((int)tx, 0, CYD_SCREEN_WIDTH - 1);
@@ -448,7 +464,7 @@ int getTouchX() {
 
 // Get screen Y coordinate (returns -1 if not touched)
 int getTouchY() {
-#ifdef CYD_35
+#if defined(CYD_35) || defined(PANDATOUCH)
     uint16_t tx, ty;
     if (!tft.getTouch(&tx, &ty, TFT_TOUCH_THRESHOLD)) return -1;
     return constrain((int)ty, 0, CYD_SCREEN_HEIGHT - 1);
@@ -464,7 +480,7 @@ int getTouchY() {
 
 // Get which menu item was tapped (-1 if none or not touched)
 int getTouchedMenuItem(int startY, int itemHeight, int itemCount) {
-#ifdef CYD_35
+#if defined(CYD_35) || defined(PANDATOUCH)
     uint16_t tx, ty;
     if (!tft.getTouch(&tx, &ty, TFT_TOUCH_THRESHOLD)) return -1;
     int screenY = constrain((int)ty, 0, CYD_SCREEN_HEIGHT - 1);
@@ -506,7 +522,7 @@ bool isBackButtonTapped() {
 
     if (millis() - lastTap < 300) return false;
 
-#ifdef CYD_35
+#if defined(CYD_35) || defined(PANDATOUCH)
     uint16_t tx, ty;
     if (!tft.getTouch(&tx, &ty, TFT_TOUCH_THRESHOLD)) return false;
     int screenX = constrain((int)tx, 0, CYD_SCREEN_WIDTH - 1);
@@ -538,7 +554,7 @@ bool isTouchInArea(int x, int y, int w, int h) {
 
     if (millis() - lastTap < 200) return false;
 
-#ifdef CYD_35
+#if defined(CYD_35) || defined(PANDATOUCH)
     uint16_t tx, ty;
     if (!tft.getTouch(&tx, &ty, TFT_TOUCH_THRESHOLD)) return false;
     int screenX = constrain((int)tx, 0, CYD_SCREEN_WIDTH - 1);
@@ -748,7 +764,7 @@ bool isBackPressed() {
     static uint32_t lastBackTouch = 0;
 
     if (millis() - lastBackTouch > 300) {
-#ifdef CYD_35
+#if defined(CYD_35) || defined(PANDATOUCH)
         uint16_t tx, ty;
         if (tft.getTouch(&tx, &ty, TFT_TOUCH_THRESHOLD)) {
             int screenY = constrain((int)ty, 0, CYD_SCREEN_HEIGHT - 1);
@@ -887,7 +903,7 @@ void drawTouchLabels(uint16_t color) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 void setTouchCalibration(uint16_t minX, uint16_t maxX, uint16_t minY, uint16_t maxY) {
-#ifdef CYD_35
+#if defined(CYD_35) || defined(PANDATOUCH)
     // E32R35T: TFT_eSPI manages calibration via calData[5] — ignore legacy params
     (void)minX; (void)maxX; (void)minY; (void)maxY;
 #else
@@ -905,9 +921,86 @@ void setTouchCalibration(uint16_t minX, uint16_t maxX, uint16_t minY, uint16_t m
 extern void saveSettings();
 
 void runTouchCalibration() {
-#ifdef CYD_35
+#ifdef PANDATOUCH
+    // GT911 capacitive touch — no raw-ADC calibration needed, but we run a
+    // first-boot 4-corner tap test so the user can verify touch accuracy and
+    // so touch_calibrated is written to NVS (preventing re-run on next boot).
+    extern void saveSettings();
+
+    int sw = tft.width();
+    int sh = tft.height();
+
+    // Corner tap positions (inset so crosshairs are fully visible)
+    const int CX[] = {30,    sw - 30, 30,    sw - 30};
+    const int CY[] = {30,    30,      sh - 30, sh - 30};
+    const char* LABELS[] = {"TOP-LEFT", "TOP-RIGHT", "BOT-LEFT", "BOT-RIGHT"};
+    const uint16_t PASS_COLOR = TFT_GREEN;
+    const uint16_t CROSS_COLOR = TFT_CYAN;
+    // Acceptable tap distance from the crosshair centre (squared for fast comparison)
+    const int TAP_RADIUS_PX = 80;
+    const int TAP_RADIUS_SQ = TAP_RADIUS_PX * TAP_RADIUS_PX;
+
+    for (int corner = 0; corner < 4; corner++) {
+        tft.fillScreen(TFT_BLACK);
+        tft.setTextSize(2);
+        tft.setTextColor(TFT_WHITE);
+        tft.setCursor(sw / 2 - 180, sh / 2 - 24);
+        tft.print("TOUCH VERIFICATION");
+        tft.setTextSize(1);
+        tft.setCursor(sw / 2 - 120, sh / 2 + 10);
+        tft.print("Tap the crosshair: ");
+        tft.print(LABELS[corner]);
+        tft.setCursor(sw / 2 - 80, sh / 2 + 28);
+        tft.setTextColor(TFT_YELLOW);
+        tft.printf("Step %d / 4", corner + 1);
+
+        // Crosshair at corner position
+        tft.drawLine(CX[corner] - 20, CY[corner], CX[corner] + 20, CY[corner], CROSS_COLOR);
+        tft.drawLine(CX[corner], CY[corner] - 20, CX[corner], CY[corner] + 20, CROSS_COLOR);
+        tft.drawCircle(CX[corner], CY[corner], 15, CROSS_COLOR);
+
+        // Wait for tap near the crosshair (within 60px)
+        uint16_t tx, ty;
+        bool tapped = false;
+        uint32_t start = millis();
+        while (!tapped && (millis() - start < 30000)) {
+            if (tft.getTouch(&tx, &ty, TFT_TOUCH_THRESHOLD)) {
+                int dx = (int)tx - CX[corner];
+                int dy = (int)ty - CY[corner];
+                if ((dx * dx + dy * dy) <= TAP_RADIUS_SQ) {
+                    tapped = true;
+                }
+            }
+            delay(20);
+        }
+
+        // Visual feedback: fill crosshair green
+        tft.fillCircle(CX[corner], CY[corner], 15, PASS_COLOR);
+        waitForTouchRelease();
+        delay(300);
+    }
+
+    // All 4 corners done → mark calibration complete
+    touch_calibrated = true;
+    saveSettings();
+
+    tft.fillScreen(TFT_BLACK);
+    tft.setTextSize(2);
+    tft.setTextColor(TFT_GREEN);
+    tft.setCursor(sw / 2 - 140, sh / 2 - 20);
+    tft.print("TOUCH VERIFIED!");
+    tft.setTextSize(1);
+    tft.setTextColor(TFT_WHITE);
+    tft.setCursor(sw / 2 - 100, sh / 2 + 14);
+    tft.print("Tap to continue...");
+    delay(800);
+    uint16_t tx, ty;
+    while (!tft.getTouch(&tx, &ty, TFT_TOUCH_THRESHOLD)) delay(20);
+    waitForTouchRelease();
+    tft.fillScreen(TFT_BLACK);
+
+#elif defined(CYD_35)
     // E32R35T: XPT2046 resistive touch — use TFT_eSPI built-in calibration
-    // Draws 4 corner crosshairs, user taps each one, computes mapping
     tft.fillScreen(TFT_BLACK);
     tft.setTextColor(TFT_WHITE);
     tft.setTextSize(1);
@@ -937,7 +1030,6 @@ void runTouchCalibration() {
     tft.setCursor(20, CYD_SCREEN_HEIGHT / 2 + 20);
     tft.println("Saved to NVS. Tap to continue.");
     delay(1000);
-    // Wait for tap to dismiss
     uint16_t tx, ty;
     while (!tft.getTouch(&tx, &ty, TFT_TOUCH_THRESHOLD)) delay(10);
     waitForTouchRelease();
@@ -1243,14 +1335,16 @@ String getButtonName(ButtonID btn) {
 void printTouchDebug() {
     #if CYD_DEBUG
     Serial.println("═══════════════════════════════════════");
-#ifdef CYD_35
+#ifdef PANDATOUCH
+    Serial.println("         TOUCH DEBUG (GT911 I2C)");
+#elif defined(CYD_35)
     Serial.println("         TOUCH DEBUG (XPT2046 TFT_eSPI)");
 #else
     Serial.println("         TOUCH DEBUG (XPT2046)");
 #endif
     Serial.println("═══════════════════════════════════════");
 
-#ifdef CYD_35
+#if defined(CYD_35) || defined(PANDATOUCH)
     uint16_t tx, ty;
     bool touched = tft.getTouch(&tx, &ty, TFT_TOUCH_THRESHOLD);
     Serial.println("Touched:    " + String(touched ? "YES" : "NO"));

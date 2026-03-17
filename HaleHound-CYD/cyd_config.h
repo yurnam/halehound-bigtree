@@ -1,6 +1,14 @@
 #ifndef CYD_CONFIG_H
 #define CYD_CONFIG_H
 
+// ─────────────────────────────────────────────────────────────────────────
+// PandaTouch board path: delegate entirely to pt_config.h and skip the
+// CYD-specific content below.
+// ─────────────────────────────────────────────────────────────────────────
+#ifdef PANDATOUCH
+  #include "pt_config.h"
+#else
+
 // ═══════════════════════════════════════════════════════════════════════════
 // HaleHound-CYD Master Pin Configuration
 // Supports: ESP32-2432S028 (2.8"), QDtech E32R28T (2.8"), QDtech E32R35T (3.5")
@@ -687,4 +695,5 @@
   #error "CYD_CONFIG: Cannot define both CYD_28 and CYD_35 - choose one"
 #endif
 
+#endif // !PANDATOUCH
 #endif // CYD_CONFIG_H

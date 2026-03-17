@@ -1,0 +1,124 @@
+[1m
+  ██╗  ██╗ █████╗ ██╗     ███████╗██╗  ██╗ ██████╗ ██╗   ██╗███╗   ██╗██████╗ 
+  ██║  ██║██╔══██╗██║     ██╔════╝██║  ██║██╔═══██╗██║   ██║████╗  ██║██╔══██╗
+  ███████║███████║██║     █████╗  ███████║██║   ██║██║   ██║██╔██╗ ██║██║  ██║
+  ██╔══██║██╔══██║██║     ██╔══╝  ██╔══██║██║   ██║██║   ██║██║╚██╗██║██║  ██║
+  ██║  ██║██║  ██║███████╗███████╗██║  ██║╚██████╔╝╚██████╔╝██║ ╚████║██████╔╝
+  ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚═════╝ 
+  PandaTouch Edition  —  ESP32-S3  |  5" 800×480  |  GT911  |  WiFi + BT
+[0m
+[0;36m[INFO][0m  Building HaleHound firmware for PandaTouch (env: pandatouch) ...
+Processing pandatouch (platform: espressif32@6.12.0; board: esp32-s3-devkitc-1; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+ ** Custom skip build targets **  */Arduino_ESP32LCD8.cpp */Arduino_ESP32QSPI.cpp
+ ** WARNING: Arduino_ESP32RGBPanel.h patch pattern not found — may already be correct **
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/esp32-s3-devkitc-1.html
+PLATFORM: Espressif 32 (6.12.0) > Espressif ESP32-S3-DevKitC-1-N8 (8 MB QD, No PSRAM)
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 16MB Flash
+DEBUG: Current (esp-builtin) On-board (esp-builtin) External (cmsis-dap, esp-bridge, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.20017.241212+sha.dcc1105b 
+ - tool-esptoolpy @ 2.40900.250804 (4.9.0) 
+ - toolchain-riscv32-esp @ 8.4.0+2021r2-patch5 
+ - toolchain-xtensa-esp32s3 @ 8.4.0+2021r2-patch5
+Converting HaleHound-CYD.ino
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 47 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- TFT_eSPI @ 2.5.43
+|-- GFX Library for Arduino @ 1.6.1
+|-- TAMC_GT911 @ 1.0.2
+|-- ArduinoJson @ 7.4.3
+|-- TinyGPSPlus @ 1.1.0
+|-- EspSoftwareSerial @ 8.2.0
+|-- rc-switch @ 2.6.4
+|-- arduinoFFT @ 2.0.4
+|-- RF24 @ 1.4.11
+|-- SmartRC-CC1101-Driver-Lib @ 2.5.7
+|-- Adafruit PN532 @ 1.3.4
+|-- ESP32 BLE Keyboard @ 0.3.2
+|-- SPI @ 2.0.0
+|-- ESP32 BLE Arduino @ 2.0.0
+|-- SD @ 2.0.0
+|-- WiFi @ 2.0.0
+|-- Update @ 2.0.0
+|-- EEPROM @ 2.0.0
+|-- Preferences @ 2.0.0
+|-- Wire @ 2.0.0
+|-- DNSServer @ 2.0.0
+|-- WebServer @ 2.0.0
+|-- Adafruit BusIO @ 1.17.4
+|-- SPIFFS @ 2.0.0
+|-- FS @ 2.0.0
+|-- LittleFS @ 2.0.0
+Skipping /home/martin/halehound-bigtree/HaleHound-CYD/.pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_ESP32LCD8.cpp
+Skipping /home/martin/halehound-bigtree/HaleHound-CYD/.pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_ESP32QSPI.cpp
+Building in release mode
+Compiling .pio/build/pandatouch/src/HaleHound-CYD.ino.cpp.o
+In file included from .pio/libdeps/pandatouch/RF24/RF24.h:18,
+                 from nrf24_config.h:11,
+                 from /home/martin/halehound-bigtree/HaleHound-CYD/HaleHound-CYD.ino:32:
+.pio/libdeps/pandatouch/RF24/RF24_config.h:23: warning: "FAILURE_HANDLING" redefined
+ #define FAILURE_HANDLING
+ 
+<command-line>: note: this is the location of the previous definition
+Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_ESP32RGBPanel.cpp.o
+Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/display/Arduino_ILI9342.cpp.o
+Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/display/Arduino_ILI9481_18bit.cpp.o
+Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/display/Arduino_ILI9486.cpp.o
+Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/display/Arduino_ILI9486_18bit.cpp.o
+Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/display/Arduino_ILI9488.cpp.o
+Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/display/Arduino_ILI9488_18bit.cpp.o
+Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/display/Arduino_ILI9488_3bit.cpp.o
+Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/display/Arduino_ILI9806.cpp.o
+Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/display/Arduino_JBT6K71.cpp.o
+Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/display/Arduino_JD9613.cpp.o
+Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/display/Arduino_NT35310.cpp.o
+.pio/libdeps/pandatouch/GFX Library for Arduino/src/databus/Arduino_ESP32RGBPanel.cpp: In member function 'uint16_t* Arduino_ESP32RGBPanel::getFrameBuffer(int16_t, int16_t)':
+.pio/libdeps/pandatouch/GFX Library for Arduino/src/databus/Arduino_ESP32RGBPanel.cpp:147:3: error: 'esp_rgb_panel_t' was not declared in this scope
+   esp_rgb_panel_t *_rgb_panel;
+   ^~~~~~~~~~~~~~~
+.pio/libdeps/pandatouch/GFX Library for Arduino/src/databus/Arduino_ESP32RGBPanel.cpp:147:3: note: suggested alternative: 'esp_lcd_panel_t'
+   esp_rgb_panel_t *_rgb_panel;
+   ^~~~~~~~~~~~~~~
+   esp_lcd_panel_t
+.pio/libdeps/pandatouch/GFX Library for Arduino/src/databus/Arduino_ESP32RGBPanel.cpp:147:20: error: '_rgb_panel' was not declared in this scope
+   esp_rgb_panel_t *_rgb_panel;
+                    ^~~~~~~~~~
+Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/display/Arduino_NT35510.cpp.o
+In file included from /home/martin/.platformio/packages/toolchain-xtensa-esp32s3/xtensa-esp32s3-elf/sys-include/stdio.h:35,
+                 from /home/martin/.platformio/packages/framework-arduinoespressif32/cores/esp32/Arduino.h:27,
+                 from .pio/libdeps/pandatouch/GFX Library for Arduino/src/Arduino_DataBus.h:8,
+                 from .pio/libdeps/pandatouch/GFX Library for Arduino/src/databus/Arduino_ESP32RGBPanel.h:18,
+                 from .pio/libdeps/pandatouch/GFX Library for Arduino/src/databus/Arduino_ESP32RGBPanel.cpp:3:
+.pio/libdeps/pandatouch/GFX Library for Arduino/src/databus/Arduino_ESP32RGBPanel.cpp:148:16: error: expected primary-expression before 'const'
+   _rgb_panel = __containerof(_panel_handle, esp_rgb_panel_t, base);
+                ^~~~~~~~~~~~~
+.pio/libdeps/pandatouch/GFX Library for Arduino/src/databus/Arduino_ESP32RGBPanel.cpp:148:16: error: expected primary-expression before ')' token
+   _rgb_panel = __containerof(_panel_handle, esp_rgb_panel_t, base);
+                ^~~~~~~~~~~~~
+.pio/libdeps/pandatouch/GFX Library for Arduino/src/databus/Arduino_ESP32RGBPanel.cpp:148:16: error: expected primary-expression before ')' token
+   _rgb_panel = __containerof(_panel_handle, esp_rgb_panel_t, base);
+                ^~~~~~~~~~~~~
+.pio/libdeps/pandatouch/GFX Library for Arduino/src/databus/Arduino_ESP32RGBPanel.cpp:148:16: error: expected primary-expression before 'const'
+   _rgb_panel = __containerof(_panel_handle, esp_rgb_panel_t, base);
+                ^~~~~~~~~~~~~
+.pio/libdeps/pandatouch/GFX Library for Arduino/src/databus/Arduino_ESP32RGBPanel.cpp:148:16: error: '__x' was not declared in this scope
+   _rgb_panel = __containerof(_panel_handle, esp_rgb_panel_t, base);
+                ^~~~~~~~~~~~~
+.pio/libdeps/pandatouch/GFX Library for Arduino/src/databus/Arduino_ESP32RGBPanel.cpp:148:16: note: suggested alternative: '__tm'
+.pio/libdeps/pandatouch/GFX Library for Arduino/src/databus/Arduino_ESP32RGBPanel.cpp:148:45: error: 'esp_rgb_panel_t' does not name a type; did you mean 'esp_lcd_panel_t'?
+   _rgb_panel = __containerof(_panel_handle, esp_rgb_panel_t, base);
+                                             ^~~~~~~~~~~~~~~
+Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/display/Arduino_NT39125.cpp.o
+Compiling .pio/build/pandatouch/lib31b/GFX Library for Arduino/display/Arduino_NV3007.cpp.o
+*** [.pio/build/pandatouch/lib31b/GFX Library for Arduino/databus/Arduino_ESP32RGBPanel.cpp.o] Error 1
+========================== [FAILED] Took 2.14 seconds ==========================
+
+Environment    Status    Duration
+-------------  --------  ------------
+pandatouch     FAILED    00:00:02.145
+==================== 1 failed, 0 succeeded in 00:00:02.145 ====================

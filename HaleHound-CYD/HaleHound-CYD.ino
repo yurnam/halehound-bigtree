@@ -4130,6 +4130,10 @@ void setup() {
 
     // Show splash screen
     showSplash();
+    // Flush framebuffer to PSRAM so the DMA-driven display shows the splash.
+    // Required because auto_flush=false is used to avoid per-pixel
+    // Cache_WriteBack_Addr calls that cause WDT on OPI PSRAM + IDF 4.4.
+    tft.flush();
 
     // Initialize subsystems
     Serial.println("[INIT] Initializing subsystems...");
@@ -4146,7 +4150,12 @@ void setup() {
     // ═══════════════════════════════════════════════════════════════════════
     // WRONG FIRMWARE DETECTION — NRF24 SPI probe catches pin mismatches
     // Covers: CYD vs E32R28T (swapped CSN pins), CYD vs CYD-HAT, missing NRF24
+    // Skipped on PandaTouch: all SPI radio pins are -1 (no radios wired).
+    // SPI.begin(-1,-1,-1) would default to SPI2 SCK/MISO/MOSI = GPIO 12/13/11
+    // which are RGB LCD data lines G3/G4/G2 — reconfiguring them corrupts the
+    // LCD_CAM DMA output and breaks the display for the rest of the session.
     // ═══════════════════════════════════════════════════════════════════════
+#ifndef PANDATOUCH
     {
         // Properly claim SPI for NRF24 check
         SPI.end();
@@ -4244,6 +4253,7 @@ void setup() {
             showSplash();
         }
     }
+#endif // !PANDATOUCH
 
     // Boot diagnostics disabled for normal boot — function kept for second board debugging
     // runBootDiagnostics();
@@ -4318,5 +4328,6 @@ void setup() {
 
 void loop() {
     handleButtons();
+    tft.flush();  // push any pending draws to PSRAM so DMA shows latest pixels
     delay(20);
 }

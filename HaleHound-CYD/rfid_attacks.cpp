@@ -2131,3 +2131,50 @@ bool isExitRequested() {
 } // namespace RFIDEmulate
 
 #endif // CYD_HAS_PN532
+
+// ── Stub implementations when PN532 hardware is absent ───────────────────────
+// Satisfies the linker when CYD_HAS_PN532 == 0 (e.g. PandaTouch build).
+// All stubs are safe no-ops; the UI still shows the RFID menu but every
+// action returns immediately with a "not available" exit.
+#if !CYD_HAS_PN532
+
+bool pn532Init()       { return false; }
+void pn532Cleanup()    {}
+bool pn532IsPresent()  { return false; }
+
+namespace RFIDScanner {
+    void setup()             {}
+    void loop()              {}
+    void cleanup()           {}
+    bool isExitRequested()   { return true; }
+}
+
+namespace RFIDReader {
+    void setup()             {}
+    void loop()              {}
+    void cleanup()           {}
+    bool isExitRequested()   { return true; }
+}
+
+namespace RFIDClone {
+    void setup()             {}
+    void loop()              {}
+    void cleanup()           {}
+    bool isExitRequested()   { return true; }
+}
+
+namespace RFIDBrute {
+    void setup()             {}
+    void loop()              {}
+    void cleanup()           {}
+    bool isExitRequested()   { return true; }
+}
+
+namespace RFIDEmulate {
+    void setup()             {}
+    void loop()              {}
+    void cleanup()           {}
+    bool isExitRequested()   { return true; }
+}
+
+#endif // !CYD_HAS_PN532
