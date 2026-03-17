@@ -69,6 +69,14 @@
 #define PT_GT911_IRQ_PIN       40
 #define PT_GT911_RST_PIN       41
 
+// Touch coordinate rotation applied in software by the TAMC_GT911 driver.
+// The GT911 flex cable on the PandaTouch PCB enters from the right edge of the
+// landscape panel, placing the controller's native (0,0) at the display's
+// bottom-right corner. ROTATION_INVERTED (180°) maps it back to top-left.
+// Change to ROTATION_NORMAL / ROTATION_LEFT / ROTATION_RIGHT if your unit
+// behaves differently (verify by running Tools → Touch Calibrate from the menu).
+#define PT_TOUCH_ROTATION  ROTATION_INVERTED
+
 // ── BOOT button ─────────────────────────────────────────────────────────────
 // GPIO0 is safe to use as the BOOT button on PandaTouch (no PA radio conflict)
 #define BOOT_BUTTON        0
@@ -105,7 +113,7 @@
 #define CYD_HAS_CC1101    0   // No SubGHz radio
 #define CYD_HAS_NRF24     0   // No 2.4 GHz radio
 #define CYD_HAS_GPS       0   // No GPS module
-#define CYD_HAS_SDCARD    0   // No SD card
+#define CYD_HAS_SDCARD    1   // USB flash drive (via USB OTG host MSC)
 #define CYD_HAS_RGB_LED   0   // No RGB LED
 #define CYD_HAS_SPEAKER   0   // No speaker
 #define CYD_HAS_PCF8574   0   // No I²C button expander

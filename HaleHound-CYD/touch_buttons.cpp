@@ -138,14 +138,17 @@ static void saveTouchCalToNVS() {
     prefs.end();
 }
 #else // PANDATOUCH
-// GT911 capacitive touch — no calibration required
+// GT911 capacitive touch — no resistive calibration required.
+// touch_calibrated is loaded from NVS by loadSettings() on every boot.
+// On first boot (NVS empty) it comes in as false, triggering the
+// first-boot touch verification screen in setup().
 uint8_t touch_cal_x_source = 0;
 uint16_t touch_cal_x_min = 0;
 uint16_t touch_cal_x_max = CYD_SCREEN_WIDTH;
 uint8_t touch_cal_y_source = 0;
 uint16_t touch_cal_y_min = 0;
 uint16_t touch_cal_y_max = CYD_SCREEN_HEIGHT;
-bool touch_calibrated = true;   // GT911 needs no calibration
+bool touch_calibrated = false;  // set to true after first-boot verification
 #endif
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -183,8 +186,10 @@ void touchButtonsSetup() {
 #ifdef PANDATOUCH
     // GT911 capacitive touch — already initialised by tft.init() via the shim.
     // No NVS calibration or SPI setup required.
+    // NOTE: touch_calibrated is NOT forced true here; it was loaded from NVS
+    // by loadSettings() already.  A false value triggers the first-boot
+    // verification screen in setup().
     _touchCalLoaded = true;
-    touch_calibrated = true;
     #if CYD_DEBUG
     Serial.println("[TOUCH] PandaTouch GT911 capacitive touch ready (via TFT_eSPI shim)");
     #endif
@@ -917,22 +922,83 @@ extern void saveSettings();
 
 void runTouchCalibration() {
 #ifdef PANDATOUCH
-    // GT911 capacitive touch needs no calibration — just show a message
+    // GT911 capacitive touch — no raw-ADC calibration needed, but we run a
+    // first-boot 4-corner tap test so the user can verify touch accuracy and
+    // so touch_calibrated is written to NVS (preventing re-run on next boot).
+    extern void saveSettings();
+
+    int sw = tft.width();
+    int sh = tft.height();
+
+    // Corner tap positions (inset so crosshairs are fully visible)
+    const int CX[] = {30,    sw - 30, 30,    sw - 30};
+    const int CY[] = {30,    30,      sh - 30, sh - 30};
+    const char* LABELS[] = {"TOP-LEFT", "TOP-RIGHT", "BOT-LEFT", "BOT-RIGHT"};
+    const uint16_t PASS_COLOR = TFT_GREEN;
+    const uint16_t CROSS_COLOR = TFT_CYAN;
+    // Acceptable tap distance from the crosshair centre (squared for fast comparison)
+    const int TAP_RADIUS_PX = 80;
+    const int TAP_RADIUS_SQ = TAP_RADIUS_PX * TAP_RADIUS_PX;
+
+    for (int corner = 0; corner < 4; corner++) {
+        tft.fillScreen(TFT_BLACK);
+        tft.setTextSize(2);
+        tft.setTextColor(TFT_WHITE);
+        tft.setCursor(sw / 2 - 180, sh / 2 - 24);
+        tft.print("TOUCH VERIFICATION");
+        tft.setTextSize(1);
+        tft.setCursor(sw / 2 - 120, sh / 2 + 10);
+        tft.print("Tap the crosshair: ");
+        tft.print(LABELS[corner]);
+        tft.setCursor(sw / 2 - 80, sh / 2 + 28);
+        tft.setTextColor(TFT_YELLOW);
+        tft.printf("Step %d / 4", corner + 1);
+
+        // Crosshair at corner position
+        tft.drawLine(CX[corner] - 20, CY[corner], CX[corner] + 20, CY[corner], CROSS_COLOR);
+        tft.drawLine(CX[corner], CY[corner] - 20, CX[corner], CY[corner] + 20, CROSS_COLOR);
+        tft.drawCircle(CX[corner], CY[corner], 15, CROSS_COLOR);
+
+        // Wait for tap near the crosshair (within 60px)
+        uint16_t tx, ty;
+        bool tapped = false;
+        uint32_t start = millis();
+        while (!tapped && (millis() - start < 30000)) {
+            if (tft.getTouch(&tx, &ty, TFT_TOUCH_THRESHOLD)) {
+                int dx = (int)tx - CX[corner];
+                int dy = (int)ty - CY[corner];
+                if ((dx * dx + dy * dy) <= TAP_RADIUS_SQ) {
+                    tapped = true;
+                }
+            }
+            delay(20);
+        }
+
+        // Visual feedback: fill crosshair green
+        tft.fillCircle(CX[corner], CY[corner], 15, PASS_COLOR);
+        waitForTouchRelease();
+        delay(300);
+    }
+
+    // All 4 corners done → mark calibration complete
+    touch_calibrated = true;
+    saveSettings();
+
     tft.fillScreen(TFT_BLACK);
-    tft.setTextColor(TFT_GREEN);
     tft.setTextSize(2);
-    tft.setCursor(20, CYD_SCREEN_HEIGHT / 2 - 10);
-    tft.println("GT911 touch needs no calibration");
+    tft.setTextColor(TFT_GREEN);
+    tft.setCursor(sw / 2 - 140, sh / 2 - 20);
+    tft.print("TOUCH VERIFIED!");
     tft.setTextSize(1);
     tft.setTextColor(TFT_WHITE);
-    tft.setCursor(20, CYD_SCREEN_HEIGHT / 2 + 20);
-    tft.println("Tap to continue.");
-    touch_calibrated = true;
-    delay(1000);
+    tft.setCursor(sw / 2 - 100, sh / 2 + 14);
+    tft.print("Tap to continue...");
+    delay(800);
     uint16_t tx, ty;
-    while (!tft.getTouch(&tx, &ty, TFT_TOUCH_THRESHOLD)) delay(10);
+    while (!tft.getTouch(&tx, &ty, TFT_TOUCH_THRESHOLD)) delay(20);
     waitForTouchRelease();
     tft.fillScreen(TFT_BLACK);
+
 #elif defined(CYD_35)
     // E32R35T: XPT2046 resistive touch — use TFT_eSPI built-in calibration
     tft.fillScreen(TFT_BLACK);

@@ -56,6 +56,22 @@
 // ── PandaTouch hardware pin definitions ────────────────────────────────────
 #include "pt_config.h"
 
+// ── USB flash-drive adapter — replaces the SPI-card SD library ─────────────
+// pt_usb_storage.h defines PtUsbStorageClass and the global 'ptSD'.
+//
+// We include <SD.h> HERE (before the macro is defined) so that the SD
+// library's  extern SDFS SD;  declaration is processed with the original
+// name 'SD'.  After this include, #pragma once prevents SD.h from being
+// re-included in any project source file, so the declaration stays clean.
+//
+// The  #define SD ptSD  below then redirects every  SD.xxx  call written in
+// project source files to our USB-backed object transparently, with no type
+// conflicts and no changes to the feature modules.
+#include <SD.h>
+#include "pt_usb_storage.h"
+#undef SD              // make sure no stray definition interferes
+#define SD ptSD        // SD.begin() / SD.open() / … → ptSD.xxx (USB drive)
+
 // ── Free fonts bundled with the TFT_eSPI package ──────────────────────────
 // These are referenced by subghz_attacks, bluetooth_attacks, gps_module, etc.
 // The files define plain GFXfont data structures — compatible with Arduino_GFX.
@@ -467,7 +483,7 @@ private:
                                 PT_LCD_H_RES,    PT_LCD_V_RES);
         _touch = &touch;
         _touch->begin();
-        _touch->setRotation(ROTATION_NORMAL);
+        _touch->setRotation(PT_TOUCH_ROTATION);
 
         _initialized = true;
     }
